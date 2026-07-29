@@ -18,6 +18,7 @@ public class TimetableTest {
     Coach coach2;
     Coach coach3;
     Coach coach4;
+    TreeMap<TimeOfDay, ArrayList<TrainingSession>> testMap;
 
     @BeforeEach
     void BeforeEach() {
@@ -47,13 +48,14 @@ public class TimetableTest {
 
         timetable.addNewTrainingSession(thursdayChildTrainingSession);
         timetable.addNewTrainingSession(saturdayChildTrainingSession);
+        testMap = new TreeMap<>();
     }
 
     @Test
     void testGetTrainingSessionsForDaySingleSession() {
         assertEquals(timetable.getTrainingSessionsForDay(singleTrainingSession.getDayOfWeek()).size(), 1);
         //Проверить, что за понедельник вернулось одно занятие
-        assertNull(timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY));
+        assertEquals(timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY), testMap);
         //Проверить, что за вторник не вернулось занятий
     }
 
@@ -72,7 +74,7 @@ public class TimetableTest {
         // Проверить, что за понедельник вернулось одно занятие
         assertEquals(timetable.getTrainingSessionsForDay(DayOfWeek.THURSDAY), testThursday);
         // Проверить, что за четверг вернулось два занятия в правильном порядке: сначала в 13:00, потом в 20:00
-        assertNull(timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY));
+        assertEquals(timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY), testMap);
         // Проверить, что за вторник не вернулось занятий
     }
 
@@ -82,7 +84,8 @@ public class TimetableTest {
         assertEquals(timetable.getTrainingSessionsForDayAndTime(singleTrainingSession.getDayOfWeek(),
                 singleTrainingSession.getTimeOfDay()).size(), 1);
         //Проверить, что за понедельник в 14:00 не вернулось занятий
-        assertNull(timetable.getTrainingSessionsForDayAndTime(DayOfWeek.MONDAY, new TimeOfDay(14, 0)));
+        ArrayList<TrainingSession> testList = new ArrayList<>();
+        assertEquals(timetable.getTrainingSessionsForDayAndTime(DayOfWeek.MONDAY, new TimeOfDay(14, 0)), testList);
     }
 
     @Test
@@ -115,12 +118,12 @@ public class TimetableTest {
         CounterOfTrainings c4 = new CounterOfTrainings(coach4, 1);
         List<CounterOfTrainings> testList = new ArrayList<>();
 
-        testList.add(c4);
         testList.add(c3);
-        testList.add(c2);
+        testList.add(c4);
         testList.add(c1);
+        testList.add(c2);
 
-        assertNotEquals(timetable.getCountByCoaches(), testList);
+        assertNotEquals(timetable.getCountByCoaches(), testList.reversed());
 
         Collections.sort(testList);
         assertEquals(timetable.getCountByCoaches(), testList.reversed());
